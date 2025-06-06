@@ -3,12 +3,9 @@
 import Link from 'next/link';
 import Image from "next/image";
 import { useQuery } from '@apollo/client';
-import { GET_BOOKS } from '../../lib/queries';
-import BookCard from './components/BookCard';
 
 
 export default function Home() {
-  const { loading, error, data } = useQuery(GET_BOOKS);
 
   return (
     <div>
