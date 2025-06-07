@@ -37,7 +37,6 @@ export default function AuthorForm({ author = null, isEditing = false }) {
     
     try {
       if (isEditing) {
-        console.log(formData)
         await updateAuthor({
           variables: {
             id: author.id,
