@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useRouter } from 'next/navigation';
-import { ADD_BOOK, UPDATE_BOOK, GET_BOOKS, GET_AUTHORS } from '../../../lib/queries';
+import { ADD_BOOK, UPDATE_BOOK, GET_BOOKS, GET_AUTHORS } from '../../../lib/apollo/queries';
 
 export default function BookForm({ book = null, isEditing = false }) {
   const router = useRouter();

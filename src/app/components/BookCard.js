@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useMutation } from '@apollo/client';
-import { DELETE_BOOK, GET_BOOKS } from '../../../lib/queries';
+import { DELETE_BOOK, GET_BOOKS } from '../../../lib/apollo/queries';
 
 export default function BookCard({ book }) {
   const [deleteBook, { loading }] = useMutation(DELETE_BOOK, {

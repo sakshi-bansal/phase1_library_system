@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from "next/image";
 import { useQuery } from '@apollo/client';
-import { GET_AUTHORS } from '../../../lib/queries';
+import { GET_AUTHORS } from '../../../lib/apollo/queries';
 import AuthorCard from '../components/AuthorCard';
 import { useState } from 'react';
 

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from "next/image";
 import { useQuery } from '@apollo/client';
-import { GET_BOOKS } from '../../../lib/queries';
+import { GET_BOOKS } from '../../../lib/apollo/queries';
 import BookCard from '../components/BookCard';
 import { useState, useMemo } from 'react';
 

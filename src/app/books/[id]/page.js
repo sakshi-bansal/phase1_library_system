@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useQuery } from '@apollo/client';
 import { useParams } from "next/navigation";
 import Link from 'next/link';
-import { GET_BOOK, GET_BOOKS } from '../../../../lib/queries';
+import { GET_BOOK } from '../../../../lib/apollo/queries';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function BookDetail() {

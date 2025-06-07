@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useQuery } from '@apollo/client';
 import { useParams } from "next/navigation";
 import Link from 'next/link';
-import { GET_AUTHOR, GET_AUTHORS } from '../../../../lib/queries';
+import { GET_AUTHOR } from '../../../../lib/apollo/queries';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function AuthorDetail() {

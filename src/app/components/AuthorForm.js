@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useRouter } from 'next/navigation';
-import { ADD_AUTHOR, UPDATE_AUTHOR, GET_AUTHORS, GET_BOOKS } from '../../../lib/queries';
+import { ADD_AUTHOR, UPDATE_AUTHOR, GET_AUTHORS, GET_BOOKS } from '../../../lib/apollo/queries';
 
 export default function AuthorForm({ author = null, isEditing = false }) {
   const router = useRouter();
