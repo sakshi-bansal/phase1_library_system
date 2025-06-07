@@ -12,11 +12,12 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const PAGE_SIZE = 10;
   
+  // Fetch ALL books instead of paginated subset
   const { loading, error, data } = useQuery(GET_BOOKS, { 
-    variables: { limit: PAGE_SIZE, offset: PAGE_SIZE * page }
+    variables: { limit: null, offset: 0 } // or remove pagination entirely if your query supports it
   });
 
-  // Filter books based on search term
+  // Filter books based on search term (across ALL books)
   const filteredBooks = useMemo(() => {
     if (!data?.books || !searchTerm.trim()) {
       return data?.books || [];
@@ -25,10 +26,24 @@ export default function Home() {
     return data.books.filter(book => {
       const searchLower = searchTerm.toLowerCase();
       const titleMatch = book.title?.toLowerCase().includes(searchLower);
-      const authorMatch = book.authors?.filter(author => { return author.name.toLowerCase().includes(searchLower) });
+      const authorMatch = book.authors?.filter(author => { 
+        return author.name.toLowerCase().includes(searchLower) 
+      });
       return titleMatch || authorMatch.length > 0;
     });
   }, [data?.books, searchTerm]);
+
+  // Paginate the filtered results client-side
+  const paginatedBooks = useMemo(() => {
+    const startIndex = page * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    return filteredBooks.slice(startIndex, endIndex);
+  }, [filteredBooks, page, PAGE_SIZE]);
+
+  // Calculate total pages for filtered results
+  const totalPages = Math.ceil(filteredBooks.length / PAGE_SIZE);
+  const hasNextPage = page < totalPages - 1;
+  const hasPrevPage = page > 0;
 
   // Reset to first page when search term changes
   const handleSearchChange = (e) => {
@@ -88,25 +103,29 @@ export default function Home() {
             {searchTerm && (
               <p className="mt-2 text-sm text-gray-600">
                 {filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''} found for "{searchTerm}"
+                {filteredBooks.length > PAGE_SIZE && ` (showing ${Math.min(PAGE_SIZE, filteredBooks.length - page * PAGE_SIZE)} per page)`}
               </p>
             )}
           </div>
         </main>
         
-        {/* Pagination Controls - Only show if not searching */}
-        {!searchTerm && (
+        {/* Pagination Controls - Show for both search and non-search results */}
+        {filteredBooks.length > PAGE_SIZE && (
           <div className="flex gap-4 items-center flex-col sm:flex-row mb-6">
             <button 
               onClick={() => setPage((prev) => Math.max(0, prev - 1))}
-              disabled={page === 0}
+              disabled={!hasPrevPage}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-600">Page {page + 1}</span>
+            <span className="text-sm text-gray-600">
+              Page {page + 1} of {totalPages}
+              {searchTerm && ` (${filteredBooks.length} total matches)`}
+            </span>
             <button 
               onClick={() => setPage((prev) => prev + 1)}
-              disabled={!data?.books || data.books.length < PAGE_SIZE}
+              disabled={!hasNextPage}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
@@ -149,7 +168,7 @@ export default function Home() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredBooks.map((book) => (
+          {paginatedBooks.map((book) => (
             <BookCard key={book.id} book={book} />
           ))}
         </div>
