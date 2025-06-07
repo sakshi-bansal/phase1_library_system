@@ -1,7 +1,8 @@
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { query } from '../../lib/database';
-
+import Book from '../../models/Book';
+import Author from '../../models/Author';
 
 const typeDefs = `#graphql
 
@@ -30,13 +31,11 @@ const typeDefs = `#graphql
   }
 
   type Query {
-    authors(limit: Int!, offset: Int!): [Author!]!
+    authors(limit: Int, offset: Int): [Author!]!
     getAuthor(id: ID!): Author
-    authorsByName(name: String!, limit: String!, offset: String!): [Author]
     
-    books(limit: Int!, offset: Int!): [Book!]!
+    books(limit: Int, offset: Int): [Book!]!
     getBook(id: ID!): Book
-    booksByTitle(title: String!, limit: String!, offset: String!): [Book]
   }
 
   type Mutation {
@@ -54,188 +53,147 @@ const resolvers = {
   Query: {
     authors: async (parents, args, context) => {
       const { limit, offset } = args;
-      const result = await query(
-        `SELECT * FROM authors LIMIT ${limit} OFFSET ${offset}`
-      );
-      return result.rows;
-    },
-
-    authorsByName: async (parents, args, context) => {
-      const result = await query(
-        `SELECT * FROM authors where name = '${args.name}' 
-        limit ${args.limit} offset ${args.offset}`
-      );
-      return result.rows;
+      const authors = await Author.findAll({
+        limit: limit,
+        offset: offset || 0,
+        order: [['updated_at', 'DESC']],
+        raw: true
+      });
+      return authors;
     },
 
     getAuthor: async (parents, args, context) => {
-      const result = await query(
-        `SELECT * FROM authors where id = '${args.id}'`
-      );
-      return result.rows[0];
+      const author = await Author.findByPk(args.id, { raw: true });
+      return author;
     },
 
     books: async (parents, args, context) => {
       const { limit, offset } = args;
-      const result = await query(
-        `SELECT * FROM books LIMIT ${limit} OFFSET ${offset}`
-      );
-      return result.rows;
-    },
-
-    booksByTitle: async (parents, args, context) => {
-      const result = await query(
-        `SELECT * FROM books where title = '${args.title}' 
-        limit ${args.limit} offset ${args.offset}`
-      );
-      return result.rows;
+      const books = await Book.findAll({
+        limit: limit,
+        offset: offset || 0,
+        order: [['updated_at', 'DESC']],
+        raw: true
+      });
+      return books;
     },
 
     getBook: async (parents, args, context) => {
-      const result = await query(
-        `SELECT * FROM books where id = '${args.id}'`
-      );
-      return result.rows[0];
+      const book = await Book.findByPk(args.id, { raw: true });
+      return book;
     },
   },
 
   Book : {
     authors: async (parent) => {
-      const result = await query(
-        `SELECT * FROM authors where id = ${parent.author_id}`
-      );
-      return result.rows;
+      const author = await Author.findByPk(parent.author_id, { raw: true });
+      return author ? [author] : [];
     },
   },
+  
 
   Author : {
     books: async (parent) => {
-      const result = await query(
-        `SELECT * FROM books where author_id = ${parent.id}`
-      );
-      return result.rows;
+      const books = await Book.findAll({
+        where: { author_id: parent.id },
+        raw: true
+      });
+      return books;
     },
   },
 
   Mutation: {
     addBook: async (parents, args, context) => {
       const { title, description, published_date, author_id } = args;
-      const result = await query(
-        `INSERT INTO books (title, description, published_date, author_id, created_at, updated_at) 
-         VALUES ($1, $2, $3, $4, now(), now()) RETURNING *`,
-        [title, description, published_date, author_id]
-      );
-
-      return result.rows[0];
+      const book = await Book.create({
+        title,
+        description,
+        published_date,
+        author_id
+      });
+      return book.toJSON();
     },
 
     updateBook: async (parents, args, context) => {
-      const { title, description, published_date, author_id } = args;
-      const updateFields = [];
-      const values = [];
-      let paramCount = 1;
+      const { id, title, description, published_date, author_id } = args;
+      
+      // Build update object with only defined fields
+      const updateData = {};
+      if (title !== undefined) updateData.title = title;
+      if (description !== undefined) updateData.description = description;
+      if (published_date !== undefined) updateData.published_date = published_date;
+      if (author_id !== undefined) updateData.author_id = author_id;
 
-      if (title !== undefined) {
-        updateFields.push(`title = $${paramCount}`);
-        values.push(title);
-        paramCount++;
-      }
+      const [updatedRowsCount] = await Book.update(updateData, {
+        where: { id },
+        returning: true
+      });
 
-      if (description !== undefined) {
-        updateFields.push(`description = $${paramCount}`);
-        values.push(description);
-        paramCount++;
-      }
-
-      if (published_date !== undefined) {
-        updateFields.push(`published_date = $${paramCount}`);
-        values.push(published_date);
-        paramCount++;
-      }
-
-      if (author_id !== undefined) {
-        updateFields.push(`author_id = $${paramCount}`);
-        values.push(author_id);
-        paramCount++;
-      }
-
-      const result = await query(
-         `UPDATE books SET ${updateFields.join(', ')} WHERE id = ${args.id} RETURNING *`,
-          values
-      );
-
-      return result.rows[0];
+      // Get the updated book
+      const updatedBook = await Book.findByPk(id, { raw: true });
+      return updatedBook;
     },
 
     deleteBook: async (parents, args, context) => {
-      const result = await query(
-        `DELETE FROM books where id = ${args.id}`,
-      );
-
-      return true;
+      const deletedCount = await Book.destroy({
+        where: { id: args.id }
+      });
+      return deletedCount > 0;
     },
 
     addAuthor: async (parents, args, context) => {
       const { name, biography, birthdate, book_id } = args;
-      const result = await query(
-        `INSERT INTO authors (name, biography, birthdate, created_at, updated_at) 
-         VALUES ($1, $2, $3, now(), now()) RETURNING *`,
-        [name, biography, birthdate]
-      );
+      
+      const author = await Author.create({
+        name,
+        biography,
+        birthdate
+      });
 
-      if (book_id != undefined) {
-        await query(
-         `UPDATE books SET author_id = ${result.rows[0].id} WHERE id = ${book_id}`
+      // If book_id is provided, update the book's author
+      if (book_id !== undefined) {
+        await Book.update(
+          { author_id: author.toJSON().id },
+          { where: { id: book_id } }
         );
       }
 
-      return result.rows[0];
+      return author.toJSON();
     },
 
     updateAuthor: async (parents, args, context) => {
-      const { name, biography, birthdate, book_id } = args;
-      const updateFields = [];
-      const values = [];
-      let paramCount = 1;
+      const { id, name, biography, birthdate, book_id } = args;
+      
+      // Build update object with only defined fields
+      const updateData = {};
+      if (name !== undefined) updateData.name = name;
+      if (biography !== undefined) updateData.biography = biography;
+      if (birthdate !== undefined) updateData.birthdate = birthdate;
 
-      if (name !== undefined) {
-        updateFields.push(`name = $${paramCount}`);
-        values.push(name);
-        paramCount++;
-      }
+      const [updatedRowsCount] = await Author.update(updateData, {
+        where: { id },
+        returning: true
+      });
 
-      if (biography !== undefined) {
-        updateFields.push(`biography = $${paramCount}`);
-        values.push(biography);
-        paramCount++;
-      }
+      // Get the updated author
+      const updatedAuthor = await Author.findByPk(id);
 
-      if (birthdate !== undefined) {
-        updateFields.push(`birthdate = $${paramCount}`);
-        values.push(birthdate);
-        paramCount++;
-      }
-
-      const result = await query(
-        `UPDATE authors SET ${updateFields.join(', ')} WHERE id = ${args.id} RETURNING *`,
-        values
-      );
-
-      if (book_id != undefined) {
-        await query(
-         `UPDATE books SET author_id = ${result.rows[0].id} WHERE id = ${book_id}`
+      // If book_id is provided, update the book's author
+      if (book_id !== undefined) {
+        await Book.update(
+          { author_id: id },
+          { where: { id: book_id } }
         );
       }
 
-      return result.rows[0];
+      return updatedAuthor.toJSON();
     },
 
     deleteAuthor: async (parents, args, context) => {
-      const result = await query(
-        `DELETE FROM authors where id = ${args.id}`,
-      );
-
-      return true;
+      const deletedCount = await Author.destroy({
+        where: { id: args.id }
+      });
+      return deletedCount > 0;
     },
   },
 };
