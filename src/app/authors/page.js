@@ -29,9 +29,23 @@ export default function Home() {
             </Link>
           </div>
         </main>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <button onClick={() => setPage((prev) => Math.max(0, prev - 1))}>Previous</button>
-          <button onClick={() => setPage((prev) => prev + 1)}>Next</button>
+
+        <div className="mt-6 flex gap-4 items-center flex-col sm:flex-row mb-6">
+          <button 
+            onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+            disabled={page === 0}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-600">Page {page + 1}</span>
+          <button 
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={!data?.authors || data.authors.length < PAGE_SIZE}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
         </div>
       </div>
 
