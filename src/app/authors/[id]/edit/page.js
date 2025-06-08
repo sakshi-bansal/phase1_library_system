@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useQuery } from '@apollo/client';
 import { useParams } from "next/navigation";
 import Link from 'next/link';
@@ -13,7 +12,7 @@ import handleSubmit from '../../../components/AuthorForm';
 export default function AuthorDetail() {
   const params = useParams();
   const { id } = params;
-  const { loading, error, data } = useQuery(GET_AUTHOR, { variables: { id: id }});
+  const { loading, data } = useQuery(GET_AUTHOR, { variables: { id: id }});
 
   if (loading) return <LoadingSpinner />;
 

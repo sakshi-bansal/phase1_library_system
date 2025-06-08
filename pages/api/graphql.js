@@ -1,6 +1,5 @@
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
-import { query } from '../../lib/database';
 import Book from '../../models/Book';
 import Author from '../../models/Author';
 
@@ -51,7 +50,7 @@ const typeDefs = `#graphql
 
 const resolvers = {
   Query: {
-    authors: async (parents, args, context) => {
+    authors: async (parents, args) => {
       const { limit, offset } = args;
       const authors = await Author.findAll({
         limit: limit,
@@ -62,12 +61,12 @@ const resolvers = {
       return authors;
     },
 
-    getAuthor: async (parents, args, context) => {
+    getAuthor: async (parents, args) => {
       const author = await Author.findByPk(args.id, { raw: true });
       return author;
     },
 
-    books: async (parents, args, context) => {
+    books: async (parents, args) => {
       const { limit, offset } = args;
       const books = await Book.findAll({
         limit: limit,
@@ -78,7 +77,7 @@ const resolvers = {
       return books;
     },
 
-    getBook: async (parents, args, context) => {
+    getBook: async (parents, args) => {
       const book = await Book.findByPk(args.id, { raw: true });
       return book;
     },
@@ -103,7 +102,7 @@ const resolvers = {
   },
 
   Mutation: {
-    addBook: async (parents, args, context) => {
+    addBook: async (parents, args) => {
       const { title, description, published_date, author_id } = args;
       const book = await Book.create({
         title,
@@ -114,7 +113,7 @@ const resolvers = {
       return book.toJSON();
     },
 
-    updateBook: async (parents, args, context) => {
+    updateBook: async (parents, args) => {
       const { id, title, description, published_date, author_id } = args;
       
       // Build update object with only defined fields
@@ -124,7 +123,7 @@ const resolvers = {
       if (published_date !== undefined) updateData.published_date = published_date;
       if (author_id !== undefined) updateData.author_id = author_id;
 
-      const [updatedRowsCount] = await Book.update(updateData, {
+      await Book.update(updateData, {
         where: { id },
         returning: true
       });
@@ -134,14 +133,14 @@ const resolvers = {
       return updatedBook;
     },
 
-    deleteBook: async (parents, args, context) => {
+    deleteBook: async (parents, args) => {
       const deletedCount = await Book.destroy({
         where: { id: args.id }
       });
       return deletedCount > 0;
     },
 
-    addAuthor: async (parents, args, context) => {
+    addAuthor: async (parents, args) => {
       const { name, biography, birthdate, book_id } = args;
       
       const author = await Author.create({
@@ -161,7 +160,7 @@ const resolvers = {
       return author.toJSON();
     },
 
-    updateAuthor: async (parents, args, context) => {
+    updateAuthor: async (parents, args) => {
       const { id, name, biography, birthdate, book_id } = args;
       
       // Build update object with only defined fields
@@ -170,7 +169,7 @@ const resolvers = {
       if (biography !== undefined) updateData.biography = biography;
       if (birthdate !== undefined) updateData.birthdate = birthdate;
 
-      const [updatedRowsCount] = await Author.update(updateData, {
+      await Author.update(updateData, {
         where: { id },
         returning: true
       });
@@ -189,7 +188,7 @@ const resolvers = {
       return updatedAuthor.toJSON();
     },
 
-    deleteAuthor: async (parents, args, context) => {
+    deleteAuthor: async (parents, args) => {
       const deletedCount = await Author.destroy({
         where: { id: args.id }
       });

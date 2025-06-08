@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { useMutation } from '@apollo/client';
 
 export default function AuthorCard({ author }) {
   return (

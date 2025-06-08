@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useQuery } from '@apollo/client';
 import { useParams } from "next/navigation";
 import Link from 'next/link';
@@ -10,7 +9,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 export default function BookDetail() {
   const params = useParams();
   const { id } = params;
-  const { loading, error, data } = useQuery(GET_BOOK, { variables: { id: id }});
+  const { loading, data } = useQuery(GET_BOOK, { variables: { id: id }});
 
   if (loading) return <LoadingSpinner />;
 
@@ -49,8 +48,8 @@ export default function BookDetail() {
           <div className="lg:w-2/3 xl:w-3/4 p-6 lg:p-8">
             <div className="mb-6">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{data?.getBook.title}</h1>
-              {data?.getBook.authors.map((author) => (
-                <span className="text-xs text-gray-500"> {author.name} </span>
+              {data?.getBook.authors.map((author, index) => (
+                <span key={index} className="text-xs text-gray-500"> {author.name} </span>
               ))}              
               <div className="flex flex-wrap gap-2 mb-4">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">

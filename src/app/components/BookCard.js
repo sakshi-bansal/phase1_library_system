@@ -38,8 +38,8 @@ export default function BookCard({ book }) {
           {book.title}
         </h3>
         <p className="text-sm text-gray-600 mb-2">
-        {book.authors.map((author) => (
-          <span className="text-xs text-gray-500"> {author.name} </span>
+        {book.authors.map((author, index) => (
+          <span key={index} className="text-xs text-gray-500"> {author.name} </span>
         ))}
         </p>
         <p className="text-sm text-gray-500 mb-3 line-clamp-2">

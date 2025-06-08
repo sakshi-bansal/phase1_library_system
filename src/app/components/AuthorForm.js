@@ -20,7 +20,7 @@ export default function AuthorForm({ author = null, isEditing = false }) {
     refetchQueries: [{ query: GET_AUTHORS }],
   });
 
-  const { loading: booksLoading, error, data: booksData } = useQuery(GET_BOOKS);
+  const { loading: booksLoading, data: booksData } = useQuery(GET_BOOKS);
 
   const loading = addLoading || updateLoading || booksLoading;
 

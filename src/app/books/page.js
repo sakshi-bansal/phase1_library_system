@@ -1,7 +1,6 @@
 "use client";
 
 import Link from 'next/link';
-import Image from "next/image";
 import { useQuery } from '@apollo/client';
 import { GET_BOOKS } from '../../../lib/apollo/queries';
 import BookCard from '../components/BookCard';
@@ -102,7 +101,7 @@ export default function Home() {
             </div>
             {searchTerm && (
               <p className="mt-2 text-sm text-gray-600">
-                {filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''} found for "{searchTerm}"
+                {filteredBooks.length} books found
                 {filteredBooks.length > PAGE_SIZE && ` (showing ${Math.min(PAGE_SIZE, filteredBooks.length - page * PAGE_SIZE)} per page)`}
               </p>
             )}
