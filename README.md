@@ -1,5 +1,5 @@
 # Library Assignment
-Manage your library and view your favorite books and authors. 
+Discover and manage your favorite books.
 
 ## Local Setup
 1. **Clone repository**
@@ -24,9 +24,7 @@ Manage your library and view your favorite books and authors.
 3. **Install Dependencies**
 
    ```bash
-   npm install sequelize sequelize-cli dotenv-cli pg pg-hstore @types/pg
-   npm install graphql @apollo/server @as-integrations/next
-   npm install @apollo/client@latest @apollo/client-integration-nextjs
+   npm install
    ```
 
 4. **Database Setup**
@@ -41,9 +39,12 @@ Manage your library and view your favorite books and authors.
    npm run dev
    ```
 
-6. **Navigate 
-	```
-	Visit [http://localhost:3000](http://localhost:3000)
-	```
+6. **Navigate**
+   ```
+   Visit [http://localhost:3000](http://localhost:3000)
+   ```
 
 ## Demo Video
+   ```bash
+    https://drive.google.com/file/d/19HzCT5GgbCD0MJqBkJKj2JDtAJMJiGir/view?usp=sharing
+    ```
