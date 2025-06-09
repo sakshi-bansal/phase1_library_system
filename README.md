@@ -22,29 +22,26 @@ Discover and manage your favorite books.
    ```
 
 3. **Install Dependencies**
-
+   
    ```bash
    npm install
    ```
 
-4. **Database Setup**
-
+5. **Database Setup**
+   
    ```bash
    npx sequelize-cli db:migrate
    npx sequelize-cli db:seed:all
    ```
 
-5. **Start Development Server**
+7. **Start Development Server**
+   
    ```bash
    npm run dev
    ```
 
-6. **Navigate**
-   ```
-   Deployed [here](https://phase1-library-system.vercel.app/)
-   ```
-
 ## Demo Video
-   ```bash
-    [Demo] (https://drive.google.com/file/d/1foT92qvInpTxaXf2IfQch2mtys8q3aQ0/view?usp=drive_link)
-    ```
+   Deployed [here](https://phase1-library-system.vercel.app/)
+   
+   Recording [here](https://drive.google.com/file/d/1foT92qvInpTxaXf2IfQch2mtys8q3aQ0/view?usp=drive_link)
+  
