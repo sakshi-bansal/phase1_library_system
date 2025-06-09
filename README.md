@@ -41,10 +41,10 @@ Discover and manage your favorite books.
 
 6. **Navigate**
    ```
-   Visit [http://localhost:3000](http://localhost:3000)
+   Deployed [here](https://phase1-library-system.vercel.app/)
    ```
 
 ## Demo Video
    ```bash
-    https://drive.google.com/file/d/19HzCT5GgbCD0MJqBkJKj2JDtAJMJiGir/view?usp=sharing
+    [Demo] (https://drive.google.com/file/d/1foT92qvInpTxaXf2IfQch2mtys8q3aQ0/view?usp=drive_link)
     ```
